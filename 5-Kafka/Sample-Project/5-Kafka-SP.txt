@@ -1,0 +1,135 @@
+By Pasakorn Limchuchua
+
+Main Reference
+-> https://github.com/codebangkok/golang
+-> https://www.youtube.com/watch?v=RjtIdUOpH04&ab_channel=CodeBangkok
+
+Docker
+-> https://hub.docker.com/r/bitnami/kafka
+-> https://hub.docker.com/_/zookeeper
+-> https://hub.docker.com/_/mariadb
+
+Go Packages
+-> https://github.com/Shopify/sarama
+-> https://github.com/spf13/viper
+-> https://pkg.go.dev/github.com/google/UUID
+
+What is kafka?
+-> https://mesodiar.com/intro-to-apache-kafka-universe-kafka-%E0%B8%84%E0%B8%B7%E0%B8%AD%E0%B8%AD%E0%B8%B0%E0%B9%84%E0%B8%A3-45f652e8233f
+
+Extensions
+-> Go, Error Lens, MySQL
+
+Connection						
+-> Host : 127.0.0.1 / port : 3306 / username : root / password : pass
+-> execute testdb3
+
+/* -----  Local ----- */
+
+: test your kafka on local (open 4 seperate terminals)
+
+: Commands
+
+install brew                -> /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" then do next step !
+install kafka               -> brew install kafka 
+
+start zookerper             -> zookeeper-server-start /opt/homebrew/etc/kafka/zookeeper.properties
+start kafka server          -> kafka-server-start /opt/homebrew/etc/kafka/server.properties
+create topics               -> kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic test
+producer                    -> kafka-console-producer --broker-list localhost:9092 --topic test
+consumer                    -> kafka-console-consumer --bootstrap-server localhost:9092 --topic test --from-beginning
+
+/* -----  Container ----- */ 
+
+: test your kafka on container (run dcoker pull & docker compose then open 3 seperate terminals)
+: use server terminal 
+
+: Commands
+
+install image               -> docker pull zookeeper
+                            -> docker pull bitnami/kafka
+run docker container	    -> docker-compose up -d (run all)
+
+check topic option          -> kafka-topics
+list topic                  -> kafka-topics --bootstrap-server localhost:9092 --list
+create topic                -> kafka-topics --bootstrap-server localhost:9092 --topic best --create
+dheck topic details         -> kafka-topics --bootstrap-server localhost:9092 --topic best --describe
+
+check producer option       -> kafka-console-producer
+produce to topic            -> kafka-console-producer --bootstrap-server localhost:9092 --topic best 
+
+check consumer option       -> kafka-console-consumer
+consume from topic          -> kafka-console-consumer --bootstrap-server localhost:9092 --topic best 
+consume from many topics    -> kafka-console-consumer --bootstrap-server localhost:9092 --include "best|noon"
+consume group from topic    -> kafka-console-consumer --bootstrap-server localhost:9092 --topic best --group con1
+
+/* ----- Go Implementation ----- */
+
+: use consumer, producer terminals
+
+: Commands
+
+create modules                  -> go mod init consumer
+                                -> go mod init producer
+run program                     -> go run .
+
+install go client for kafka     -> go get github.com/Shopify/sarama
+[consumer]
+
+/* ----- Sample Project ----- */
+
+Overview            :   https://youtu.be/RjtIdUOpH04?t=2225
+Additional Tasks    :   - show account balance          
+                        - show history transactions
+
+: use consumer, producer terminals
+
+: Commands
+
+// consumer
+install events package          -> go get events (not forget to fix go.mod file)
+install configuration solution  -> go get github.com/spf13/viper
+install ORM library             -> go get gorm.io/gorm
+install mysql driver            -> go get gorm.io/driver/mysql
+
+test list :
+- kafka-topics --bootstrap-server localhost:9092 --list
+- kafka-consumer-groups --bootstrap-server localhost:9092 --list
+
+test consumer :
+consumer cli :
+- kafka-console-consumer --bootstrap-server localhost:9092 --include "CloseAccountEvent|DepositFundEvent|OpenAccountEvent|WithdrawFundEvent"
+consumer go : 
+- go run . 
+producer cli : send as json -> slice of byte --Unmarshal--> object
+- kafka-console-producer --bootstrap-server localhost:9092 --topic OpenAccountEvent
+> {"ID":"000001","AccountHolder":"Best","AccountType":1,"Balance":10000}
+- kafka-console-producer --bootstrap-server localhost:9092 --topic DepositFundEvent
+> {"ID":"000001","Amount":5000}
+- kafka-console-producer --bootstrap-server localhost:9092 --topic WithdrawFundEvent
+> {"ID":"000001","Amount":5000}
+- kafka-console-producer --bootstrap-server localhost:9092 --topic CloseAccountEvent
+> {"ID":"000001"}
+
+// producer
+install events package          -> go get events (not forget to fix go.mod file)
+install configuration solution  -> go get github.com/spf13/viper
+install auto gen ID             -> go get github.com/google/uuid
+install web framework           -> go get github.com/gofiber/fiber/v2
+
+test system :
+producer go : 
+- go run .
+consumer go : 
+- go run . 
+consumer cli :
+- kafka-console-consumer --bootstrap-server localhost:9092 --include "CloseAccountEvent|DepositFundEvent|OpenAccountEvent|WithdrawFundEvent|ShowBalanceEvent"
+test api :
+> curl -H 'content-type:application/json' localhost:8000/openaccount -d '{"AccountHolder":"Noon","AccountType":1,"Balance":10000}' -i
+> curl -H 'content-type:application/json' localhost:8000/depositfund -d '{"id":"178f3586-ee4d-4ed1-8e01-9e03fccec214","Amount":5000}' -i
+> curl -H 'content-type:application/json' localhost:8000/withdrawfund -d '{"id":"178f3586-ee4d-4ed1-8e01-9e03fccec214","Amount":5000}' -i
+> curl -H 'content-type:application/json' localhost:8000/closeaccount -d '{"id":"178f3586-ee4d-4ed1-8e01-9e03fccec214"}' -i
+> curl -H 'content-type:application/json' localhost:8000/showbalance -d '{"id":"178f3586-ee4d-4ed1-8e01-9e03fccec214"}' -i
+> curl -H 'content-type:application/json' localhost:8000/showtransactions -d '{"id":"178f3586-ee4d-4ed1-8e01-9e03fccec214"}' -i
+
+// not forget to change id
