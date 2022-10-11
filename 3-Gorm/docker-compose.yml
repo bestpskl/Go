@@ -1,0 +1,11 @@
+version: "3.4"
+
+services:
+  mydb:
+    image: mysql
+    container_name: mydb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+    ports:
+      - 3306:3306
