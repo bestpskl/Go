@@ -1,0 +1,103 @@
+//  start server before send request
+
+//  ---------- GET ----------
+
+### 
+GET http://localhost:8000/hello
+
+//  ---------- POST ----------
+
+###
+POST http://localhost:8000/hello
+
+
+//  ---------- Locals ----------
+
+### 
+GET http://localhost:8000/hellolocals
+
+//  ---------- Params ----------
+
+### Parameter
+GET http://localhost:8000/hello/best
+
+### Optional Parameter
+GET http://localhost:8000/hello/best/limchuchua
+
+### Wildcards
+GET http://localhost:8000/wildcards/hello/world
+
+//  ---------- ParamsInt ----------
+
+### Number Parameter
+GET http://localhost:8000/hello2/1
+
+### Number Parameter (Bad Request)
+GET http://localhost:8000/hello2/x
+
+//  ---------- Query ---------- 
+
+###
+GET http://localhost:8000/query?name=best&surname=limchuchua
+
+//  ---------- QueryParser ---------- 
+
+###
+GET http://localhost:8000/query2?id=1&name=best
+Content-Type: application/json
+
+//  ---------- Body ----------
+
+###
+POST http://localhost:8000/body
+Content-Type: application/json
+
+{"name" : "best"}
+
+//  ----------BodyParser ----------
+
+###
+POST http://localhost:8000/body2
+Content-Type: application/json
+
+{"name" : "best"}
+
+###
+POST http://localhost:8000/body3
+Content-Type: application/json
+
+{"name" : "best"}
+
+//  ---------- Environment ----------
+
+###
+GET http://localhost:8000/env?name=best
+
+//  ---------- Static ----------
+
+###
+GET http://localhost:8000/
+
+//  ---------- Group ----------
+//  ---------- Set ----------
+
+### v1
+GET http://localhost:8000/v1/hello
+
+### v2
+GET http://localhost:8000/v2/hello
+
+//  ---------- Mount ----------
+
+###
+GET http://localhost:8000/user/login
+
+//  ---------- Server ----------
+
+### sent > 1 time
+GET http://localhost:8000/server
+
+//  ---------- NewError ----------
+
+###
+GET http://localhost:8000/error
